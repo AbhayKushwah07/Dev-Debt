@@ -111,6 +111,10 @@ export class ApiService {
     return this.http.get<Repository[]>(`${this.apiUrl}/repositories`);
   }
 
+  getRepository(id: number): Observable<Repository & { scans: Scan[] }> {
+    return this.http.get<Repository & { scans: Scan[] }>(`${this.apiUrl}/repositories/${id}`);
+  }
+
   addRepository(repo: GithubRepo): Observable<Repository> {
     return this.http.post<Repository>(`${this.apiUrl}/repositories`, {
       githubRepoId: repo.id.toString(),

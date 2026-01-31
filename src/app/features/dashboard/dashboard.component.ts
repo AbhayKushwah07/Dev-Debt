@@ -172,7 +172,41 @@ export class DashboardComponent implements OnInit {
   }
 
   selectRepo(repo: Repository) {
-    this.selectedRepo = this.selectedRepo?.id === repo.id ? null : repo;
+    if (this.selectedRepo?.id === repo.id) {
+      this.selectedRepo = null;
+      this.scanResults.set([]);
+      this.scanStatus.set(null);
+    } else {
+      this.selectedRepo = repo;
+      this.loadRepoDetails(repo.id);
+    }
+  }
+
+  private loadRepoDetails(repoId: number) {
+    this.scanResults.set([]);
+    this.scanStatus.set('Loading details...');
+    
+    this.api.getRepository(repoId).subscribe({
+      next: (repo) => {
+        if (repo.scans && repo.scans.length > 0) {
+          const latestScan = repo.scans[0];
+          this.scanStatus.set(latestScan.status);
+          
+          if (latestScan.status === 'COMPLETED') {
+            this.loadScanResults(latestScan.id);
+          } else if (latestScan.status === 'RUNNING' || latestScan.status === 'PENDING') {
+            this.scanning.set(true);
+            this.pollScan(latestScan.id);
+          }
+        } else {
+          this.scanStatus.set('No scans yet');
+        }
+      },
+      error: (err) => {
+        console.error('Error loading repo details:', err);
+        this.scanStatus.set('Error loading repo');
+      }
+    });
   }
 
   scanRepo(repoId: number) {

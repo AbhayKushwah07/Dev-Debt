@@ -1,20 +1,54 @@
-version: '3.8'
-
 services:
-  frontend:
+  # ============================================
+  # DEVELOPMENT PROFILE
+  # ============================================
+
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: devdebt_frontend_dev
+    profiles: [ "dev" ]
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Mount entire project for hot-reload (Windows needs polling)
+      - .:/app
+      # Exclude node_modules to use container's installed packages
+      - /app/node_modules
+    networks:
+      - frontend-network
+
+  # ============================================
+  # PRODUCTION PROFILE
+  # ============================================
+
+  frontend-prod:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - API_URL=${API_URL:-http://localhost:3000}
     container_name: devdebt_frontend
+    profiles: [ "prod" ]
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "80:80"
     environment:
       - API_URL=${API_URL:-http://localhost:3000}
     networks:
       - frontend-network
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:80" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
   frontend-network:

@@ -98,7 +98,8 @@ import { ApiService, DebtMetric, Repository } from '../../core/services/api.serv
           </div>
 
           <!-- Scan Results -->
-          <div *ngIf="scanResults().length" class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <!-- Scan Results -->
+          <div *ngIf="scanResults().length" class="space-y-8">
             <app-sprawl-metrics [metrics]="scanResults()"></app-sprawl-metrics>
             <app-heatmap [data]="heatmapData"></app-heatmap>
           </div>
@@ -138,13 +139,16 @@ export class DashboardComponent implements OnInit {
   // Heatmap data derived from scan results
   get heatmapData(): any {
     const metrics = this.scanResults();
+    console.log('[Dashboard] heatmapData getter called, metrics count:', metrics.length);
+    
     if (!metrics.length) return null;
 
     // Group by directory structure
     const root: any = { name: 'root', children: [] };
     
     for (const metric of metrics) {
-      const parts = metric.filePath.split('/');
+      // Handle both forward and backward slashes
+      const parts = metric.filePath.replace(/\\/g, '/').split('/').filter(p => p);
       let current = root;
       
       for (let i = 0; i < parts.length - 1; i++) {
@@ -156,14 +160,17 @@ export class DashboardComponent implements OnInit {
         current = child;
       }
       
-      // Add file
-      current.children.push({
-        name: parts[parts.length - 1],
-        value: metric.loc,
-        score: metric.sprawlScore * 50 // Scale for visibility
-      });
+      // Add file as leaf node
+      if (parts.length > 0) {
+        current.children.push({
+          name: parts[parts.length - 1],
+          value: metric.loc || 1, // Ensure non-zero value
+          score: (metric.sprawlScore || 0) * 50 // Scale for visibility
+        });
+      }
     }
 
+    console.log('[Dashboard] heatmapData built with', root.children.length, 'top-level items');
     return root;
   }
 

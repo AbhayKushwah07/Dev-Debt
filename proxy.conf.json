@@ -1,0 +1,17 @@
+{
+  "/api": {
+    "target": "http://host.docker.internal:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "logLevel": "debug"
+  },
+  "/auth": {
+    "target": "http://host.docker.internal:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

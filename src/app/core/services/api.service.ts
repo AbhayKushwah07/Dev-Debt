@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, interval, switchMap, takeWhile, map } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 // GitHub Repository from user's account
 export interface GithubRepo {

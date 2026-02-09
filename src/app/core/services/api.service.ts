@@ -95,18 +95,18 @@ export interface ScanResults {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = '/api';
+  private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // ==================== GitHub Repos ====================
-  
+
   getGithubRepos(): Observable<GithubRepo[]> {
     return this.http.get<GithubRepo[]>(`${this.apiUrl}/github/repos`);
   }
 
   // ==================== Repositories ====================
-  
+
   getRepositories(): Observable<Repository[]> {
     return this.http.get<Repository[]>(`${this.apiUrl}/repositories`);
   }
@@ -132,10 +132,10 @@ export class ApiService {
   }
 
   // ==================== Scans ====================
-  
+
   startScan(repoId: number): Observable<{ scanId: number; status: string }> {
     return this.http.post<{ scanId: number; status: string }>(
-      `${this.apiUrl}/scans/${repoId}`, 
+      `${this.apiUrl}/scans/${repoId}`,
       {}
     );
   }

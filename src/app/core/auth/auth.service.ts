@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class AuthService {
 
   loginWithGithub() {
     // Redirect to backend auth endpoint
-    window.location.href = 'http://localhost:3000/auth/github';
+    window.location.href = environment.apiUrl + '/auth/github';
   }
 
   handleCallback(token: string) {
